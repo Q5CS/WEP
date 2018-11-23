@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>发现 · 泉州五中作业本闲鱼</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src='/js/jquery.base64.js'></script>
+    <script src="/js/jquery.cookie.js"></script>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/wep.js"></script>
+</head>
+
+<body onload="initMarketPlace()">
+    <!-- <body> -->
+    <p id="tData" hidden="hidden">{{.}}</p>
+    <div class="container-fluid">
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
+                        aria-expanded="false">
+                        <span class="sr-only">切换导航</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">泉州五中作业本闲鱼</a>
+                </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/">首页</a></li>
+                        <li><a href="/dashboard">仪表板</a></li>
+                        <li class="active"><a href="#">发现</a></li>
+                        <li><a href="/create">创建</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="user"><span class="glyphicon glyphicon-user"></span>&nbsp;<span id="name"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/report"><span class="glyphicon glyphicon-comment"></span>&nbsp;反馈</a></li>
+                                <li><a onclick="exit()"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <div class="page-header">
+                        <h1>发现</h1>
+                    </div>
+                    <!-- <div class="row">
+                                <table class="table" id="table"></table>
+                            </div> -->
+                    <ul id="data" class="nav nav-tabs">
+                        <li class="active"><a href="#tabBigBook" data-toggle="tab">大作业本</a></li>
+                        <li><a href="#tabSmallBook" data-toggle="tab">小作业本</a></li>
+                        <li><a href="#tabEnglishBook" data-toggle="tab">英语本</a></li>
+                        <li><a href="#tabChineseComp" data-toggle="tab">语文作文本</a></li>
+                        <li><a href="#tabEnglishComp" data-toggle="tab">英语作文本</a></li>
+                    </ul>
+                    <div id="dataContent" class="tab-content">
+                        <div class="tab-pane fade in active" id="tabBigBook">
+                            <div class="table-responsive">
+                                <button class="btn" onclick="launchFilterModal('BigBook')"><span class="glyphicon glyphicon glyphicon-filter" aria-hidden="true"></span></button>
+                                <table class="table" id="BigBook">
+                                    <thead>
+                                        <th>#</th>
+                                        <th>数量</th>
+                                        <th>类型</th>
+                                        <th>创建时间</th>
+                                        <th>创建者班级</th>
+                                        <th>操作</th>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="tabSmallBook">
+                                <button class="btn" onclick="launchFilterModal('SmallBook')"><span class="glyphicon glyphicon glyphicon-filter" aria-hidden="true"></span></button>
+                            <div class="table-responsive">
+                                <table class="table" id="SmallBook">
+                                    <thead>
+                                        <th>#</th>
+                                        <th>数量</th>
+                                        <th>类型</th>
+                                        <th>创建时间</th>
+                                        <th>创建者班级</th>
+                                        <th>操作</th>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="tabEnglishBook">
+                                <button class="btn" onclick="launchFilterModal('EnglishBook')"><span class="glyphicon glyphicon glyphicon-filter" aria-hidden="true"></span></button>
+                            <div class="table-responsive">
+                                <table class="table" id="EnglishBook">
+                                    <thead>
+                                        <th>#</th>
+                                        <th>数量</th>
+                                        <th>类型</th>
+                                        <th>创建时间</th>
+                                        <th>创建者班级</th>
+                                        <th>操作</th>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="tabChineseComp">
+                                <button class="btn" onclick="launchFilterModal('ChineseComp')"><span class="glyphicon glyphicon glyphicon-filter" aria-hidden="true"></span></button>
+                            <div class="table-responsive">
+                                <table class="table" id="ChineseComp">
+                                    <thead>
+                                        <th>#</th>
+                                        <th>数量</th>
+                                        <th>类型</th>
+                                        <th>创建时间</th>
+                                        <th>创建者班级</th>
+                                        <th>操作</th>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="tabEnglishComp">
+                                <button class="btn" onclick="launchFilterModal('EnglishComp')"><span class="glyphicon glyphicon glyphicon-filter" aria-hidden="true"></span></button>
+                            <div class="table-responsive">
+                                <table class="table" id="EnglishComp">
+                                    <thead>
+                                        <th>#</th>
+                                        <th>数量</th>
+                                        <th>类型</th>
+                                        <th>创建时间</th>
+                                        <th>创建者班级</th>
+                                        <th>操作</th>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        <!-- Modal -->
+        <div class="modal fade" id="message" tabindex="-1" role="dialog" aria-labelledby="modalLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="modalLabel">提示</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p id="msg"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="window.location.href='/dashboard'">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+    <div class="modal fade" id="filter" tabindex="-1" role="dialog" aria-labelledby="modalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modalLabel">筛选</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="amount">数目</label>
+                            <input type="number" class="form-control" id="amount">
+                        </div>
+                        <div class="form-group">
+                            <label for="type">类型</label><br>
+                            <label class="radio-inline" id="type">
+                                <input type="radio" name="type" value="入手">入手
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="type" value="出手">出手
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label for="grade">年段</label>
+                            <input type="text" class="form-control" id="grade">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" id="filterConfirm">确认</button>
+                    <button type="button" class="btn" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</body>
+</html>

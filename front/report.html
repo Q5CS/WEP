@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>反馈 · 泉州五中作业本闲鱼</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src='/js/jquery.base64.js'></script>
+    <script src="/js/jquery.cookie.js"></script>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/wep.js"></script>
+    <script>
+        $(function () {
+            $("#email").hover(function () {
+                $("#email").text($.base64.decode("cmVwb3J0QG9yZG9zeC50ZWNo"))
+            })
+        })
+    </script>
+</head>
+
+<body onload="initPage()">
+    <div class="container-fluid">
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
+                        aria-expanded="false">
+                        <span class="sr-only">切换导航</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">泉州五中作业本闲鱼</a>
+                </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li><a href="/">首页</a></li>
+                        <li><a href="/dashboard">仪表板</a></li>
+                        <li><a href="/marketPlace">发现</a></li>
+                        <li><a href="/create">创建</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="user"><span class="glyphicon glyphicon-user"></span>&nbsp;<span id="name"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#"><span class="glyphicon glyphicon-comment"></span>&nbsp;反馈</a></li>
+                                <li><a onclick="exit()" role="button"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+        <div class="row">
+            <div class="col-md-8 col-md-offset-2">
+                <div class="page-header">
+                    <h1>反馈</h1>
+                </div>
+                <p class="lead">
+                    在使用本平台的过程中，如果有功能改进的意见或建议，或者碰到进行恶意行为的用户，可以根据下面的联系方式反馈、举报!
+                </p>
+                <h3>要求</h3>
+                <p>反馈建议的邮件需注明你的姓名、班级、触发Bug的操作以及遇到该Bug的大致时间。</p>
+                <p>举报用户的邮件需注明双方姓名、班级以及对方的违规操作</p>
+                <h3>邮箱</h3>
+                <p id="email">[轻触或鼠标移动到此查看]</p>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>
