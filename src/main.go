@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"os"
 	"tool"
@@ -112,12 +111,12 @@ func dashboard(w http.ResponseWriter, r *http.Request) {
 		data := base64.StdEncoding.EncodeToString([]byte(original))
 		t.Execute(w, data)
 	} else {
-		ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+		ip := r.Header.Get("X-Real-Ip")
 		tool.Log("Dashboard", "Unknown", ip, "Validate Fail")
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		return
 	}
-	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+	ip := r.Header.Get("X-Real-Ip")
 	tool.Log("DashBoard", uID, ip, "Succ")
 }
 
@@ -182,17 +181,17 @@ func handleOppositeInfo(w http.ResponseWriter, r *http.Request) {
 				tool.Log("GetInfo", "Sys", "localhost", "Database Error")
 				result.Status = "Server Failure"
 			} else {
-				ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+				ip := r.Header.Get("X-Real-Ip")
 				tool.Log("GetOppositeInfo", uID, ip, "Succ")
 				result.Status = "Success"
 			}
 		} else {
-			ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+			ip := r.Header.Get("X-Real-Ip")
 			tool.Log("GetOppositeInfo", "Unknown", ip, "Validate Fail")
 			result.Status = "Unauthorized"
 		}
 	} else {
-		ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+		ip := r.Header.Get("X-Real-Ip")
 		tool.Log("GetOppositeInfo", "Unknown", ip, "Validate Fail")
 		result.Status = "Unauthorized"
 	}
@@ -233,12 +232,12 @@ func handleCreate(w http.ResponseWriter, r *http.Request) {
 			tool.Log("Create", "Sys", "localhost", "Database Error")
 			w.Write([]byte("Server Failure"))
 		} else {
-			ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+			ip := r.Header.Get("X-Real-Ip")
 			tool.Log("HandleCreate", uID, ip, "Succ")
 			w.Write([]byte("Success"))
 		}
 	} else {
-		ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+		ip := r.Header.Get("X-Real-Ip")
 		tool.Log("HandleCreate", "Unknown", ip, "Validate Fail")
 		w.Write([]byte("Unauthorized"))
 	}
@@ -268,12 +267,12 @@ func handleMatch(w http.ResponseWriter, r *http.Request) {
 			tool.Log("Match", "Sys", "localhost", "Database Error")
 			w.Write([]byte("Server Failure"))
 		} else {
-			ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+			ip := r.Header.Get("X-Real-Ip")
 			tool.Log("HandleMatch", uID, ip, "Succ")
 			w.Write([]byte("Success"))
 		}
 	} else {
-		ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+		ip := r.Header.Get("X-Real-Ip")
 		tool.Log("HandleMatch", "Unknown", ip, "Validate Fail")
 		w.Write([]byte("Unauthorized"))
 	}
@@ -303,17 +302,17 @@ func handleDelete(w http.ResponseWriter, r *http.Request) {
 				tool.Log("Delete", "Sys", "localhost", "Database Error")
 				w.Write([]byte("Server Failure"))
 			} else {
-				ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+				ip := r.Header.Get("X-Real-Ip")
 				tool.Log("HandleDelete", uID, ip, "Succ")
 				w.Write([]byte("Success"))
 			}
 		} else {
-			ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+			ip := r.Header.Get("X-Real-Ip")
 			tool.Log("HandleDelete", uID, ip, "Permission Denied")
 			w.Write([]byte("Unauthorized"))
 		}
 	} else {
-		ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+		ip := r.Header.Get("X-Real-Ip")
 		tool.Log("HandleDelete", "Unknown", ip, "Validate Fail")
 		w.Write([]byte("Unauthorized"))
 	}
@@ -350,17 +349,17 @@ func handleReject(w http.ResponseWriter, r *http.Request) {
 				tool.Log("Create After Reject", "Sys", "localhost", "Database Error")
 				w.Write([]byte("Server Failure"))
 			} else {
-				ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+				ip := r.Header.Get("X-Real-Ip")
 				tool.Log("HandleReject", uID, ip, "Succ")
 				w.Write([]byte("Success"))
 			}
 		} else {
-			ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+			ip := r.Header.Get("X-Real-Ip")
 			tool.Log("HandleReject", uID, ip, "Permission Denied")
 			w.Write([]byte("Unauthorized"))
 		}
 	} else {
-		ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+		ip := r.Header.Get("X-Real-Ip")
 		tool.Log("HandleReject", "Unknown", ip, "Validate Fail")
 		w.Write([]byte("Unauthorized"))
 	}
@@ -397,17 +396,17 @@ func handleCancel(w http.ResponseWriter, r *http.Request) {
 				tool.Log("Create After Cancel", "Sys", "localhost", "Database Error")
 				w.Write([]byte("Server Failure"))
 			} else {
-				ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+				ip := r.Header.Get("X-Real-Ip")
 				tool.Log("HandleCancel", uID, ip, "Succ")
 				w.Write([]byte("Success"))
 			}
 		} else {
-			ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+			ip := r.Header.Get("X-Real-Ip")
 			tool.Log("HandleCancel", uID, ip, "Permission Denied")
 			w.Write([]byte("Unauthorized"))
 		}
 	} else {
-		ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+		ip := r.Header.Get("X-Real-Ip")
 		tool.Log("HandleCancel", "Unknown", ip, "Validate Fail")
 		w.Write([]byte("Unauthorized"))
 	}
@@ -438,17 +437,17 @@ func handleConfirm(w http.ResponseWriter, r *http.Request) {
 				tool.Log("Confirm", "Sys", "localhost", "Database Error")
 				w.Write([]byte("Server Failure"))
 			} else {
-				ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+				ip := r.Header.Get("X-Real-Ip")
 				tool.Log("Confirm", uID, ip, "Succ")
 				w.Write([]byte("Success"))
 			}
 		} else {
-			ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+			ip := r.Header.Get("X-Real-Ip")
 			tool.Log("HandleConfirm", uID, ip, "Permission Denied")
 			w.Write([]byte("Unauthorized"))
 		}
 	} else {
-		ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+		ip := r.Header.Get("X-Real-Ip")
 		tool.Log("HandleConfirm", "Unknown", ip, "Validate Fail")
 		w.Write([]byte("Unauthorized"))
 	}
@@ -502,13 +501,13 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			tool.Log("HandleLogin", "Sys", "localhost", "Controller Error")
 		}
-		ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+		ip := r.Header.Get("X-Real-Ip")
 		tool.Log("Login", result.UID, ip, "Succ")
 		w.Write(b)
 	} else {
 		result.Status, result.UID, result.Name = "fail", "", ""
 		b, err = json.Marshal(result)
-		ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+		ip := r.Header.Get("X-Real-Ip")
 		tool.Log("StudentValidate", "Unknown", ip, "Validate Fail")
 		w.Write(b)
 	}
@@ -520,6 +519,6 @@ func handleExit(w http.ResponseWriter, r *http.Request) {
 		tool.Log("HandleExit", "Sys", "localhost", "Controller Error")
 	}
 	delete(users, string(b))
-	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+	ip := r.Header.Get("X-Real-Ip")
 	tool.Log("HandleExit", string(b), ip, "Succ")
 }
