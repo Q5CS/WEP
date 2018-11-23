@@ -16,46 +16,44 @@
 
 <body onload="initPage()">
     <div class="container-fluid">
-            <nav class="navbar navbar-default">
-                    <div class="container-fluid">
-                        <!-- Brand and toggle get grouped for better mobile display -->
-                        <div class="navbar-header">
-                            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
-                                aria-expanded="false">
-                                <span class="sr-only">切换导航</span>
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                                <span class="icon-bar"></span>
-                            </button>
-                            <a class="navbar-brand" href="/">泉州五中作业本闲鱼</a>
-                        </div>
-            
-                        <!-- Collect the nav links, forms, and other content for toggling -->
-                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                            <ul class="nav navbar-nav">
-                                <li class="active"><a href="#">首页</a></li>
-                                <li><a href="/dashboard">仪表板</a></li>
-                                <li><a href="/marketPlace">发现</a></li>
-                                <li><a href="/create">创建</a></li>
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">切换导航</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/">泉州五中作业本闲鱼</a>
+                </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav">
+                        <li class="active"><a href="#">首页</a></li>
+                        <li><a href="/dashboard">仪表板</a></li>
+                        <li><a href="/marketPlace">发现</a></li>
+                        <li><a href="/create">创建</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="user"><span class="glyphicon glyphicon-user"></span>&nbsp;<span id="name"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="https://github.com/Q5CS/WEP/issues"><span class="glyphicon glyphicon-comment"></span>&nbsp;反馈</a></li>
+                                <li><a onclick="exit()" role="button"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a></li>
                             </ul>
-                            <ul class="nav navbar-nav navbar-right">
-                                <li class="dropdown">
-                                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="user"><span class="glyphicon glyphicon-user"></span>&nbsp;<span
-                                            id="name"></span></a>
-                                    <ul class="dropdown-menu">
-                                        <li><a href="/report"><span class="glyphicon glyphicon-comment"></span>&nbsp;反馈</a></li>
-                                        <li><a onclick="exit()" role="button"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a></li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </div><!-- /.navbar-collapse -->
-                    </div><!-- /.container-fluid -->
-                </nav>
+                        </li>
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
         <div class="row">
             <div class="col-md-9">
                 <div class="jumbotron">
                     <h1>泉州五中作业本闲鱼</h1>
-                    <p>五中人的闲置作业本信息发布平台</p>
+                    <p>五中人的闲置作业本流转平台</p>
                     <p><a class="btn btn-primary btn-lg" href="/login" role="button">登录 »</a></p>
                 </div>
                 <div class="page-header">
@@ -65,7 +63,8 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="touritalHeading">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#touritalContent" aria-expanded="true" aria-controls="touritalContent">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#touritalContent"
+                                    aria-expanded="true" aria-controls="touritalContent">
                                     使用教程
                                 </a>
                             </h4>
@@ -85,7 +84,8 @@
                     <div class="panel panel-default">
                         <div class="panel-heading" role="tab" id="QAHeading">
                             <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#QAContent" aria-expanded="true" aria-controls="QAContent">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#QAContent"
+                                    aria-expanded="true" aria-controls="QAContent">
                                     常见问题
                                 </a>
                             </h4>
@@ -99,21 +99,7 @@
                                 <p>Q：创建者与匹配者如何找到对方？</p>
                                 <p>A：建议由匹配者根据信息找创建者，因为创建者不一定能及时发现发布信息的改变。当然，如果明明被匹配却没有人上门，创建者也可以根据信息寻找匹配者。</p>
                                 <hr>
-                                <p>若有其他问题欢迎在“反馈”页面提交，你的名字将有可能出现在感谢者名单中。</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="jailHeading">
-                            <h4 class="panel-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#jailContent" aria-expanded="true" aria-controls="jailContent">
-                                    小黑屋
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="jailContent" class="panel-collapse collapse" role="tabpanel" aria-labelledby="jailHeading">
-                            <div class="panel-body">
-                                没有恶意行为，天气晴好。
+                                <p>若有其他问题欢迎在“反馈”页面提交，你的名字将有可能出现在贡献者名单中。</p>
                             </div>
                         </div>
                     </div>
@@ -126,8 +112,16 @@
                         学校每学期都会分发大量作业本，而由于各位同学使用方式存在差异，出现了“有人没本子用，有本子没人用”的现象，其中又以后者居多，造成极大的浪费。
                     </p>
                     <p>
-                        制作本站的目的，既是为了平衡现有需求量以减少浪费，更是为了将“互联网+”引入作业本分配，在不久的将来带来分配方式的革命性优化。
+                        制作本站的目的正是为了平衡现有需求量以减少浪费。后期还可能与学校合作，借助本平台减少作业本的制作量、改善作业本分配。
                     </p>
+                    <br>
+                    <h2>贡献者</h2>
+                    <ul>
+                        <li><strong>黄泽源</strong>：作者&nbsp;&nbsp;<a href="www.ordosx.tech">博客：OrdosX</a></li>
+                        <li><strong>陈鸿飞</strong>：在技术问题上鼎力相助的巨佬&nbsp;&nbsp;<a href="www.fly3949.com">博客：梦之翼</a></li>
+                        <li><strong>林志艺</strong>：平台诞生的地方————泉州五中Fablab的负责老师</li>
+                        <li><strong>Vultr</strong>：主机提供商，想买云主机的不考虑一下吗？<a href="https://www.vultr.com/?ref=7407413">优惠链接</a></li>
+                    </ul>
                 </div>
             </div>
         </div>
