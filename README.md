@@ -42,4 +42,5 @@ A Workbook Exchange Platform 一个作业本流转平台
 以下是未来可能实现的东西
 * 将dashboard与marketplace的数据改为由AJAX拉取
 * 通过命令行指定数据库地址与账密
+* 实现自己的SessionID而不是套用官网接口返回的ID
 * 添加更多的注释供诸公参考
