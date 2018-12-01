@@ -6,7 +6,7 @@ import (
 	"os"
 
 	//匿名导入数据库驱动
-	_ "github.com/Go-SQL-Driver/MySQL"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var db *sql.DB
@@ -21,8 +21,8 @@ func checkErr(err error) {
 }
 
 //CreateConnection 启动数据库连接
-func CreateConnection() bool {
-	newDB, err := sql.Open("mysql", "app:app@tcp(192.168.1.101:3306)/q5xy?charset=utf8")
+func CreateConnection(password string) bool {
+	newDB, err := sql.Open("mysql", "app:"+password+"@tcp(localhost:3306)/q5xy?charset=utf8")
 	checkErr(err)
 	db = newDB
 	isMarketPlaceModified = true
