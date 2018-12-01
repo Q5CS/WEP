@@ -7,9 +7,6 @@ A Workbook Exchange Platform 一个作业本流转平台
 制作本站的目的正是为了平衡现有需求量以减少浪费。后期还可能与学校合作，借助本平台减少作业本的制作量、改善作业本分配。
 
 ## 部署
-~暂时没用，因为五中学生验证模块暂时撤下以等待统一登录接口，但还是写写吧。~
-
-就算有了Oauth，你以为我就有时间重构代码了吗？咕咕咕
 ### 1 安装环境
 到[Golang中文网](https://studygolang.com/dl) 下载最新的Go安装包并配置好环境变量
 
@@ -42,16 +39,16 @@ A Workbook Exchange Platform 一个作业本流转平台
 克隆
 
     git clone https://github.com/Q5CS/WEP.git
-将src/tool/的dbControl.go中第25行改为你设置的数据库地址、用户名及密码，按照以下格式：
-
-    用户名:密码@tcp(数据库IP:数据库端口)/q5xy?charset=utf8
 将src目录下文件复制到你设置的gopath的src文件夹，然后在gopath中打开命令窗口，编译
 
-    go build ./src/main.go
-将生成的文件与front目录放在一起，运行，打开浏览器输入`localhost:9090`就可以看到效果了。
+    go build ./src/wep.go
+将生成的文件与front目录放在一起，运行。client_secret要向电研社[五中人开放授权平台](https://doc.qz5z.ren/oauth2/)申请，mysql_password是前面设置的数据库密码。
+
+    ./wep -s client_secret -p mysql_password
+打开浏览器输入`localhost:9090`就可以看到效果了。
 ## TODO
 以下是未来可能实现的东西
-* 将dashboard与marketplace的数据改为由AJAX拉取
-* 通过命令行指定数据库地址与账密
-* 实现自己的SessionID而不是套用官网接口返回的ID
-* 添加更多的注释供诸公参考
+- [ ] 将dashboard与marketplace的数据改为由AJAX拉取
+- [x] 通过命令行指定数据库地址与账密
+- [x] 实现自己的SessionID而不是套用官网接口返回的ID
+- [ ] 添加更多的注释供诸公参考
