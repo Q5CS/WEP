@@ -183,29 +183,6 @@ function initMarketPlace() {
     }
 }
 
-function login() {
-    $.base64.utf8encode = true
-    var json = {
-        username: $("#username").val(),
-        password: $.base64.encode($("#password").val())
-    };
-    $.post("/handlers/login", JSON.stringify(json),
-        function (original) {
-            var data = JSON.parse(original)
-            var message
-            if (data.status == "succ") {
-                $.cookie("name", data.name)
-                $.cookie("uid", data.uID)
-                $.cookie("sessionID", data.sessionID)
-                $(window).attr('location', '/dashboard');
-            } else if (data == "fail") {
-                message = `登录失败，请重试！\n如果能登录官网，请<a href="/report">点此反馈</a>`
-                $("#msg").html(message)
-                $('#message').modal()
-            }
-        });
-}
-
 function create() {
     var json = {
         "uid": $.cookie("uid"),
@@ -217,7 +194,7 @@ function create() {
         function (data) {
             var message
             if (data == "Server Failure") {
-                message = `服务器端异常，请<a href="/report">点此反馈</a>`
+                message = `服务器端异常，请<a href="https://github.com/Q5CS/WEP/issues">点此反馈</a>`
             } else if (data == "Unauthorized") {
                 message = "请先登录"
                 $(window).attr('location', '/login');
@@ -239,7 +216,7 @@ function match(orderID) {
             function (data) {
                 var message
                 if (data == "Server Failure") {
-                    message = `服务器端异常，请<a href="/report">点此反馈</a>`
+                    message = `服务器端异常，请<a href="https://github.com/Q5CS/WEP/issues">点此反馈</a>`
                 } else if (data == "Unauthorized") {
                     $(window).attr('location', '/login');
                     return
@@ -267,7 +244,7 @@ function showInfo(role, orderID) {
             } else if (data.status == "Success") {
                 $("#info").html(`姓名：` + data.name + `&nbsp;&nbsp;&nbsp;班级：` + data.class)
             } else if (data.status == "Server Failure") {
-                $("#info").html(`服务器端异常，请<a href="/report">点此反馈</a>`)
+                $("#info").html(`服务器端异常，请<a href="https://github.com/Q5CS/WEP/issues">点此反馈</a>`)
             }
             $('#oppositeInfo').modal()
         });
@@ -278,7 +255,7 @@ function del(orderID) {
         function (data) {
             var message
             if (data == "Server Failure") {
-                message = `服务器端异常，请<a href="/report">点此反馈</a>`
+                message = `服务器端异常，请<a href="https://github.com/Q5CS/WEP/issues">点此反馈</a>`
             } else if (data == "Unauthorized") {
                 $(window).attr('location', '/login');
                 return
@@ -295,7 +272,7 @@ function reject(orderID) {
         function (data) {
             var message
             if (data == "Server Failure") {
-                message = `服务器端异常，请<a href="/report">点此反馈</a>`
+                message = `服务器端异常，请<a href="https://github.com/Q5CS/WEP/issues">点此反馈</a>`
             } else if (data == "Unauthorized") {
                 $(window).attr('location', '/login');
                 return
@@ -312,7 +289,7 @@ function cancel(orderID) {
         function (data) {
             var message
             if (data == "Server Failure") {
-                message = `服务器端异常，请<a href="/report">点此反馈</a>`
+                message = `服务器端异常，请<a href="https://github.com/Q5CS/WEP/issues">点此反馈</a>`
             } else if (data == "Unauthorized") {
                 $(window).attr('location', '/login');
                 return
@@ -329,7 +306,7 @@ function confirm(orderID) {
         function (data) {
             var message
             if (data == "Server Failure") {
-                message = `服务器端异常，请<a href="/report">点此反馈</a>`
+                message = `服务器端异常，请<a href="https://github.com/Q5CS/WEP/issues">点此反馈</a>`
             } else if (data == "Unauthorized") {
                 $(window).attr('location', '/login');
                 return
@@ -346,7 +323,7 @@ function exit() {
         function (data) {
             var message
             if (data == "Server Failure") {
-                message = `服务器端异常，请<a href="/report">点此反馈</a>`
+                message = `服务器端异常，请<a href="https://github.com/Q5CS/WEP/issues">点此反馈</a>`
             } else {
                 $.cookie("name", '', { expires: -1 })
                 $.cookie("uid", '', { expires: -1 })
