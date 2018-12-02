@@ -16,6 +16,7 @@ function doAuth(code) {
             if(res.status == "fail") {
                 alert("错误，请重新登录！");
                 $(window).attr('location', '/login');
+                return;
             }
             $.cookie("name", res.name)
             $.cookie("uid", res.uID)
