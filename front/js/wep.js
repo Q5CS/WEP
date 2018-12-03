@@ -329,6 +329,7 @@ function exit() {
                 $.cookie("uid", '', { expires: -1 })
                 $.cookie("sessionID", '', { expires: -1 })
                 $(window).attr('location', '/');
+                return;
             }
             $("#msg").text(message)
             $('#message').modal()
