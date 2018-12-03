@@ -1,15 +1,59 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-cn">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>请稍候</title>
 </head>
+
 <body>
     <p>正在与服务器通信，请稍候</p>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="/js/jquery.min.js"></script>
     <script src="/js/jquery.cookie.js"></script>
-    <script src="/js/auth_callback.js"></script>
+    <script>
+        code = request("code");
+        doAuth(code);
+
+        function doAuth(code) {
+            $.ajax({
+                type: "POST",
+                url: "/handlers/auth_callback",
+                data: {
+                    "code": code
+                },
+                dataType: "json",
+                success: function (res) {
+                    console.log(res);
+                    if (res.status == "fail") {
+                        alert("错误，请重新登录！");
+                        $(window).attr('location', '/login');
+                        return;
+                    }
+                    $.cookie("name", res.name)
+                    $.cookie("uid", res.uID)
+                    $.cookie("sessionID", res.sessionID)
+                    $(window).attr('location', '/dashboard');
+                }
+            });
+        }
+
+        function request(paras) {
+            var url = location.href;
+            var paraString = url.substring(url.indexOf("?") + 1, url.length).split("&");
+            var paraObj = {}
+            for (i = 0; j = paraString[i]; i++) {
+                paraObj[j.substring(0, j.indexOf("=")).toLowerCase()] = j.substring(j.indexOf("=") + 1, j.length);
+            }
+            var returnValue = paraObj[paras.toLowerCase()];
+            if (typeof (returnValue) == "undefined") {
+                return "";
+            } else {
+                return returnValue;
+            }
+        }
+    </script>
 </body>
+
 </html>
