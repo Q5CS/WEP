@@ -2,6 +2,7 @@ package tool
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"os"
 
@@ -118,26 +119,29 @@ func Create(id string, item string, amount string, kind string) bool {
 }
 
 //Match 配对订单
-func Match(uID string, orderID string) bool {
-	rows, err := db.Query("select status from orders where id=?", orderID)
+func Match(uID string, orderID string) error {
+	rows, err := db.Query("select creator,status from orders where id=?", orderID)
 	if err != nil {
-		return false
+		return err
 	}
-	var status string
+	var creator, status string
 	for rows.Next() {
-		err = rows.Scan(&status)
+		err = rows.Scan(&creator, &status)
 		if err != nil {
-			return false
+			return err
 		}
 	}
-	if status == "0" {
-		_, err = db.Exec("update orders set matcher=?,status=1 where id=?", uID, orderID)
-		if err != nil {
-			return false
-		}
+	if creator == uID {
+		return errors.New("Selfing")
+	} else if status != "0" {
+		return errors.New("Invalid Status")
+	}
+	_, err = db.Exec("update orders set matcher=?,status=1 where id=?", uID, orderID)
+	if err != nil {
+		return err
 	}
 	isMarketPlaceModified = true
-	return true
+	return nil
 }
 
 //GetInfo 获取另一个用户的班级信息

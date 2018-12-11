@@ -222,6 +222,10 @@ function match(orderID) {
                     return
                 } else if (data == "Success") {
                     message = "成功匹配"
+                } else if (data == "Selfing") {
+                    message = "不能匹配自己！"
+                } else if (data == "Invalid Status") {
+                    message = "看上去已经被抢先匹配了"
                 }
                 $("#msg").text(message)
                 $('#message').modal()

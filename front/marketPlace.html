@@ -40,7 +40,7 @@
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#" id="user"><span class="glyphicon glyphicon-user"></span>&nbsp;<span id="name"></span></a>
                             <ul class="dropdown-menu">
                                 <li><a href="https://github.com/Q5CS/WEP/issues"><span class="glyphicon glyphicon-comment"></span>&nbsp;反馈</a></li>
-                                <li><a onclick="exit()"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a></li>
+                                <li><a onclick="exit()" role="button"><span class="glyphicon glyphicon-log-out"></span>&nbsp;退出</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -159,7 +159,7 @@
                         <p id="msg"></p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="window.location.href='/dashboard'">关闭</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="window.location.reload()">关闭</button>
                     </div>
                 </div>
             </div>

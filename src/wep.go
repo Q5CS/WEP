@@ -256,10 +256,15 @@ func handleMatch(w http.ResponseWriter, r *http.Request) {
 	uID, sessionID := cUID.Value, cSessionID.Value
 	orderID, _ := ioutil.ReadAll(r.Body)
 	if users[uID].SessionID == sessionID {
-		succ := tool.Match(uID, string(orderID))
-		if !succ {
-			tool.Log("Match", "Sys", "localhost", "Database Error")
-			w.Write([]byte("Server Failure"))
+		err = tool.Match(uID, string(orderID))
+		if err != nil {
+			if err.Error() == "Selfing" || err.Error() == "Invalid Status" {
+				tool.Log("Match", "Sys", "localhost", err.Error())
+				w.Write([]byte(err.Error()))
+			} else {
+				tool.Log("Match", "Sys", "localhost", "Database Error")
+				w.Write([]byte("Server Failure"))
+			}
 		} else {
 			ip := r.Header.Get("X-Real-Ip")
 			tool.Log("HandleMatch", uID, ip, "Succ")
