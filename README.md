@@ -34,7 +34,7 @@ A Workbook Exchange Platform 一个作业本流转平台
     CREATE TABLE orders ( id INT AUTO_INCREMENT, creator INT, matcher INT, item INT, amount INT, kind INT, date DATETIME, status INT, PRIMARY KEY (id));
 创建日志表
 
-    CREATE TABLE logs ( time DATETIME，action VARCHAR(20), user VARCHAR(20), ip VARCHAR(20), status VARCHAR(20));
+    CREATE TABLE logs ( time DATETIME, action VARCHAR(20), user VARCHAR(20), ip VARCHAR(20), status VARCHAR(20));
 ### 3 下载并编译
 克隆
 
