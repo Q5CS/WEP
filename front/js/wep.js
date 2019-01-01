@@ -353,7 +353,7 @@ function launchFilterModal(index) {
             var amo = a[1].innerText;
             var typ = a[2].innerText;
             var gra = a[4].innerText;
-            if ((amount != "" && amo != amount) || (grade != "" && gra != grade) || typ != type) {
+            if ((amount != "" && amo != amount) || (grade != "" && gra != grade) || (type != undefined && typ != type)) {
                 a.hide();
             } else {
                 a.show();
