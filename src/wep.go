@@ -58,11 +58,12 @@ func main() {
 	http.HandleFunc("/", index)
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/auth_callback", authCallback)
-	http.HandleFunc("/report", report)
 	http.HandleFunc("/dashboard", dashboard)
 	http.HandleFunc("/marketPlace", marketPlace)
 	http.HandleFunc("/create", create)
 
+	http.HandleFunc("/handlers/dashboard", handleDashboard)
+	http.HandleFunc("/handlers/marketPlace", handleMarketPlace)
 	http.HandleFunc("/handlers/oppositeInfo", handleOppositeInfo)
 	http.HandleFunc("/handlers/create", handleCreate)
 	http.HandleFunc("/handlers/match", handleMatch)
@@ -99,56 +100,65 @@ func authCallback(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, nil)
 }
 
-func report(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("./front/report.html")
-	t.Execute(w, nil)
-}
-
 func dashboard(w http.ResponseWriter, r *http.Request) {
-	cUID, err := r.Cookie("uid")
-	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		tool.Log("ReadCookie", "Sys", "localhost", "Controller Error")
-		return
-	}
-	cSessionID, err := r.Cookie("sessionID")
-	if err != nil {
-		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		tool.Log("ReadSession", "Sys", "localhost", "Controller Error")
-		return
-	}
-	uID, sessionID := cUID.Value, cSessionID.Value
-	if users[uID].SessionID == sessionID {
-		t, _ := template.ParseFiles("./front/dashboard.html")
-		succ, original := tool.PraseTable(uID)
-		if !succ {
-			tool.Log("PraseTable", "Sys", "localhost", "Database Error")
-		}
-		data := base64.StdEncoding.EncodeToString([]byte(original))
-		t.Execute(w, data)
-	} else {
-		ip := r.Header.Get("X-Real-Ip")
-		tool.Log("Dashboard", "Unknown", ip, "Validate Fail")
-		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		return
-	}
-	ip := r.Header.Get("X-Real-Ip")
-	tool.Log("DashBoard", uID, ip, "Succ")
+	t, _ := template.ParseFiles("./front/dashboard.html")
+	t.Execute(w, nil)
 }
 
 func marketPlace(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("./front/marketPlace.html")
-	succ, original := tool.PraseMarketPlace()
-	if !succ {
-		tool.Log("MarketPlace", "Sys", "localhost", "Database Error")
-	}
-	data := base64.StdEncoding.EncodeToString([]byte(original))
-	t.Execute(w, data)
+	t.Execute(w, nil)
 }
 
 func create(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("./front/create.html")
 	t.Execute(w, nil)
+}
+
+func handleDashboard(w http.ResponseWriter, r *http.Request) {
+	/* cUID, err := r.Cookie("uid")
+	if err != nil {
+		w.Write([]byte("Server Failure"))
+		tool.Log("ReadCookie", "Sys", "localhost", "Controller Error")
+		return
+	}
+	cSessionID, err := r.Cookie("sessionID")
+	if err != nil {
+		w.Write([]byte("Server Failure"))
+		tool.Log("ReadSession", "Sys", "localhost", "Controller Error")
+		return
+	} */
+	var data struct {
+		UID       string `json:"uid"`
+		SessionID string `json:"sessionID"`
+	}
+	b, _ := ioutil.ReadAll(r.Body)
+	json.Unmarshal(b, &data)
+	if users[uID].SessionID == data.SessionID {
+		succ, original := tool.PraseTable(data.UID)
+		if !succ {
+			w.Write([]byte("Server Failure"))
+			tool.Log("PraseTable", "Sys", "localhost", "Database Error")
+		} else {
+			data := base64.StdEncoding.EncodeToString([]byte(original))
+			w.Write([]byte(data))
+			ip := r.Header.Get("X-Real-Ip")
+			tool.Log("DashBoard", uID, ip, "Succ")
+		}
+	} else {
+		ip := r.Header.Get("X-Real-Ip")
+		w.Write([]byte("Unauthorized"))
+		tool.Log("Dashboard", "Unknown", ip, "Validate Fail")
+	}
+}
+
+func handleMarketPlace(w http.ResponseWriter, r *http.Request) {
+	succ, original := tool.PraseMarketPlace()
+	if !succ {
+		tool.Log("MarketPlace", "Sys", "localhost", "Database Error")
+	}
+	data := base64.StdEncoding.EncodeToString([]byte(original))
+	w.Write([]byte(data))
 }
 
 func handleOppositeInfo(w http.ResponseWriter, r *http.Request) {

@@ -11,7 +11,24 @@ function initPage() {
 function initDashboard() {
     initPage()
     $.base64.utf8decode = true;
-    var original = $.base64.atob($("#tData").text());
+    var original;
+    var json = {
+        "uid": $.cookie("uid"),
+        "sessionID": $.cookie("sessionID")
+    };
+    $.post("/handlers/dashboard", JSON.stringify(json),
+        function (data) {
+            if (data == "Server Failure") {
+                alert(`服务器端异常，请到github.com/Q5CS/WEP/issues反馈`);
+                return;
+            } else if (data == "Unauthorized") {
+                alert("请先登录");
+                $(window).attr('location', '/login');
+                return;
+            } else {
+                original = $.base64.atob(data);
+            }
+        });
     if (original == "Empty Set") {
         $("#create").html("<thead><tr><th>ID</th><th>物品</th><th>数量</th><th>类型</th><th>创建时间</th><th>状态</th><th>操作</th></tr></thead><tbody><tr><td colspan=\"7\">这里什么都没有</td></tr></tbody>");
         $("#match").html("<thead><tr><th>ID</th><th>物品</th><th>数量</th><th>类型</th><th>创建时间</th><th>状态</th><th>操作</th></tr></thead><tbody><tr><td colspan=\"7\">这里什么都没有</td></tr></tbody>");
@@ -161,7 +178,25 @@ function initMarketPlace() {
     initPage()
     $.base64.utf8decode = true;
     var tables = new Array($("#BigBook tbody"), $("#SmallBook tbody"), $("#EnglishBook tbody"), $("#ChineseComp tbody"), $("#EnglishComp tbody"))
-    var original = $.base64.atob($("#tData").text())
+    //var original = $.base64.atob($("#tData").text())
+    var original;
+    var json = {
+        "uid": $.cookie("uid"),
+        "sessionID": $.cookie("sessionID")
+    };
+    $.post("/handlers/marketPlace", JSON.stringify(json),
+        function (data) {
+            if (data == "Server Failure") {
+                alert(`服务器端异常，请到github.com/Q5CS/WEP/issues反馈`);
+                return;
+            } else if (data == "Unauthorized") {
+                alert("请先登录");
+                $(window).attr('location', '/login');
+                return;
+            } else {
+                original = $.base64.atob(data);
+            }
+        });
     var all = original.split("||")
     for (let i = 0; i < all.length - 1; i++) {
         if (all[i] == "-") {
