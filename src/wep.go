@@ -11,7 +11,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"tool"
 )
 
 type user struct {
@@ -47,8 +46,8 @@ func main() {
 	}
 
 	users = make(map[string]user)
-	tool.CreateConnection(p)
-	tool.Log("Start", "sys", "localhost", "Succ")
+	createConnection(p)
+	log("Start", "sys", "localhost", "Succ")
 
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./front/css/"))))
 	http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(http.Dir("./front/fonts/"))))
@@ -119,13 +118,13 @@ func handleDashboard(w http.ResponseWriter, r *http.Request) {
 	/* cUID, err := r.Cookie("uid")
 	if err != nil {
 		w.Write([]byte("Server Failure"))
-		tool.Log("ReadCookie", "Sys", "localhost", "Controller Error")
+		log("ReadCookie", "Sys", "localhost", "Controller Error")
 		return
 	}
 	cSessionID, err := r.Cookie("sessionID")
 	if err != nil {
 		w.Write([]byte("Server Failure"))
-		tool.Log("ReadSession", "Sys", "localhost", "Controller Error")
+		log("ReadSession", "Sys", "localhost", "Controller Error")
 		return
 	} */
 	var data struct {
@@ -134,28 +133,28 @@ func handleDashboard(w http.ResponseWriter, r *http.Request) {
 	}
 	b, _ := ioutil.ReadAll(r.Body)
 	json.Unmarshal(b, &data)
-	if users[uID].SessionID == data.SessionID {
-		succ, original := tool.PraseTable(data.UID)
+	if users[data.UID].SessionID == data.SessionID {
+		succ, original := praseTable(data.UID)
 		if !succ {
 			w.Write([]byte("Server Failure"))
-			tool.Log("PraseTable", "Sys", "localhost", "Database Error")
+			log("PraseTable", "Sys", "localhost", "Database Error")
 		} else {
-			data := base64.StdEncoding.EncodeToString([]byte(original))
-			w.Write([]byte(data))
+			dashBoardData := base64.StdEncoding.EncodeToString([]byte(original))
+			w.Write([]byte(dashBoardData))
 			ip := r.Header.Get("X-Real-Ip")
-			tool.Log("DashBoard", uID, ip, "Succ")
+			log("DashBoard", data.UID, ip, "Succ")
 		}
 	} else {
 		ip := r.Header.Get("X-Real-Ip")
 		w.Write([]byte("Unauthorized"))
-		tool.Log("Dashboard", "Unknown", ip, "Validate Fail")
+		log("Dashboard", "Unknown", ip, "Validate Fail")
 	}
 }
 
 func handleMarketPlace(w http.ResponseWriter, r *http.Request) {
-	succ, original := tool.PraseMarketPlace()
+	succ, original := praseMarketPlace()
 	if !succ {
-		tool.Log("MarketPlace", "Sys", "localhost", "Database Error")
+		log("MarketPlace", "Sys", "localhost", "Database Error")
 	}
 	data := base64.StdEncoding.EncodeToString([]byte(original))
 	w.Write([]byte(data))
@@ -165,13 +164,13 @@ func handleOppositeInfo(w http.ResponseWriter, r *http.Request) {
 	cUID, err := r.Cookie("uid")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		tool.Log("ReadCookie", "Sys", "localhost", "Controller Error")
+		log("ReadCookie", "Sys", "localhost", "Controller Error")
 		return
 	}
 	cSessionID, err := r.Cookie("sessionID")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		tool.Log("ReadSession", "Sys", "localhost", "Controller Error")
+		log("ReadSession", "Sys", "localhost", "Controller Error")
 		return
 	}
 	uID, sessionID := cUID.Value, cSessionID.Value
@@ -187,25 +186,25 @@ func handleOppositeInfo(w http.ResponseWriter, r *http.Request) {
 		Class  string `json:"class"`
 	}
 	if users[uID].SessionID == sessionID {
-		if tool.HavePermission(uID, data.Role, data.OrderID) {
+		if havePermission(uID, data.Role, data.OrderID) {
 			var succ bool
-			succ, result.Name, result.Class = tool.GetInfo(uID, data.Role, data.OrderID)
+			succ, result.Name, result.Class = getInfo(uID, data.Role, data.OrderID)
 			if !succ {
-				tool.Log("GetInfo", "Sys", "localhost", "Database Error")
+				log("GetInfo", "Sys", "localhost", "Database Error")
 				result.Status = "Server Failure"
 			} else {
 				ip := r.Header.Get("X-Real-Ip")
-				tool.Log("GetOppositeInfo", uID, ip, "Succ")
+				log("GetOppositeInfo", uID, ip, "Succ")
 				result.Status = "Success"
 			}
 		} else {
 			ip := r.Header.Get("X-Real-Ip")
-			tool.Log("GetOppositeInfo", "Unknown", ip, "Validate Fail")
+			log("GetOppositeInfo", "Unknown", ip, "Validate Fail")
 			result.Status = "Unauthorized"
 		}
 	} else {
 		ip := r.Header.Get("X-Real-Ip")
-		tool.Log("GetOppositeInfo", "Unknown", ip, "Validate Fail")
+		log("GetOppositeInfo", "Unknown", ip, "Validate Fail")
 		result.Status = "Unauthorized"
 	}
 	b, err = json.Marshal(result)
@@ -216,13 +215,13 @@ func handleCreate(w http.ResponseWriter, r *http.Request) {
 	cUID, err := r.Cookie("uid")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		tool.Log("ReadCookie", "Sys", "localhost", "Controller Error")
+		log("ReadCookie", "Sys", "localhost", "Controller Error")
 		return
 	}
 	cSessionID, err := r.Cookie("sessionID")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		tool.Log("ReadSession", "Sys", "localhost", "Controller Error")
+		log("ReadSession", "Sys", "localhost", "Controller Error")
 		return
 	}
 	uID, sessionID := cUID.Value, cSessionID.Value
@@ -234,18 +233,18 @@ func handleCreate(w http.ResponseWriter, r *http.Request) {
 	b, err := ioutil.ReadAll(r.Body)
 	json.Unmarshal(b, &data)
 	if users[uID].SessionID == sessionID {
-		succ := tool.Create(uID, data.Item, data.Amount, data.Kind)
+		succ := createNew(uID, data.Item, data.Amount, data.Kind)
 		if !succ {
-			tool.Log("Create", "Sys", "localhost", "Database Error")
+			log("Create", "Sys", "localhost", "Database Error")
 			w.Write([]byte("Server Failure"))
 		} else {
 			ip := r.Header.Get("X-Real-Ip")
-			tool.Log("HandleCreate", uID, ip, "Succ")
+			log("HandleCreate", uID, ip, "Succ")
 			w.Write([]byte("Success"))
 		}
 	} else {
 		ip := r.Header.Get("X-Real-Ip")
-		tool.Log("HandleCreate", "Unknown", ip, "Validate Fail")
+		log("HandleCreate", "Unknown", ip, "Validate Fail")
 		w.Write([]byte("Unauthorized"))
 	}
 }
@@ -254,35 +253,35 @@ func handleMatch(w http.ResponseWriter, r *http.Request) {
 	cUID, err := r.Cookie("uid")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		tool.Log("ReadCookie", "Sys", "localhost", "Controller Error")
+		log("ReadCookie", "Sys", "localhost", "Controller Error")
 		return
 	}
 	cSessionID, err := r.Cookie("sessionID")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		tool.Log("ReadSession", "Sys", "localhost", "Controller Error")
+		log("ReadSession", "Sys", "localhost", "Controller Error")
 		return
 	}
 	uID, sessionID := cUID.Value, cSessionID.Value
 	orderID, _ := ioutil.ReadAll(r.Body)
 	if users[uID].SessionID == sessionID {
-		err = tool.Match(uID, string(orderID))
+		err = match(uID, string(orderID))
 		if err != nil {
 			if err.Error() == "Selfing" || err.Error() == "Invalid Status" {
-				tool.Log("Match", "Sys", "localhost", err.Error())
+				log("Match", "Sys", "localhost", err.Error())
 				w.Write([]byte(err.Error()))
 			} else {
-				tool.Log("Match", "Sys", "localhost", "Database Error")
+				log("Match", "Sys", "localhost", "Database Error")
 				w.Write([]byte("Server Failure"))
 			}
 		} else {
 			ip := r.Header.Get("X-Real-Ip")
-			tool.Log("HandleMatch", uID, ip, "Succ")
+			log("HandleMatch", uID, ip, "Succ")
 			w.Write([]byte("Success"))
 		}
 	} else {
 		ip := r.Header.Get("X-Real-Ip")
-		tool.Log("HandleMatch", "Unknown", ip, "Validate Fail")
+		log("HandleMatch", "Unknown", ip, "Validate Fail")
 		w.Write([]byte("Unauthorized"))
 	}
 }
@@ -291,35 +290,35 @@ func handleDelete(w http.ResponseWriter, r *http.Request) {
 	cUID, err := r.Cookie("uid")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		tool.Log("ReadCookie", "Sys", "localhost", "Controller Error")
+		log("ReadCookie", "Sys", "localhost", "Controller Error")
 		return
 	}
 	cSessionID, err := r.Cookie("sessionID")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		tool.Log("ReadSession", "Sys", "localhost", "Controller Error")
+		log("ReadSession", "Sys", "localhost", "Controller Error")
 		return
 	}
 	uID, sessionID := cUID.Value, cSessionID.Value
 	orderID, _ := ioutil.ReadAll(r.Body)
 	if users[uID].SessionID == sessionID {
-		if tool.HavePermission(uID, "0", string(orderID)) {
-			if !tool.Delete(string(orderID)) {
-				tool.Log("Delete", "Sys", "localhost", "Database Error")
+		if havePermission(uID, "0", string(orderID)) {
+			if !deleteOrder(string(orderID)) {
+				log("Delete", "Sys", "localhost", "Database Error")
 				w.Write([]byte("Server Failure"))
 			} else {
 				ip := r.Header.Get("X-Real-Ip")
-				tool.Log("HandleDelete", uID, ip, "Succ")
+				log("HandleDelete", uID, ip, "Succ")
 				w.Write([]byte("Success"))
 			}
 		} else {
 			ip := r.Header.Get("X-Real-Ip")
-			tool.Log("HandleDelete", uID, ip, "Permission Denied")
+			log("HandleDelete", uID, ip, "Permission Denied")
 			w.Write([]byte("Unauthorized"))
 		}
 	} else {
 		ip := r.Header.Get("X-Real-Ip")
-		tool.Log("HandleDelete", "Unknown", ip, "Validate Fail")
+		log("HandleDelete", "Unknown", ip, "Validate Fail")
 		w.Write([]byte("Unauthorized"))
 	}
 }
@@ -328,42 +327,42 @@ func handleReject(w http.ResponseWriter, r *http.Request) {
 	cUID, err := r.Cookie("uid")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		tool.Log("ReadCookie", "Sys", "localhost", "Controller Error")
+		log("ReadCookie", "Sys", "localhost", "Controller Error")
 		return
 	}
 	cSessionID, err := r.Cookie("sessionID")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		tool.Log("ReadSession", "Sys", "localhost", "Controller Error")
+		log("ReadSession", "Sys", "localhost", "Controller Error")
 		return
 	}
 	uID, sessionID := cUID.Value, cSessionID.Value
 	orderID, _ := ioutil.ReadAll(r.Body)
 	if users[uID].SessionID == sessionID {
-		if tool.HavePermission(uID, "0", string(orderID)) {
-			succ, creator, item, amount, kind := tool.Reject(string(orderID))
+		if havePermission(uID, "0", string(orderID)) {
+			succ, creator, item, amount, kind := reject(string(orderID))
 			if !succ {
-				tool.Log("Reject", "Sys", "localhost", "Database Error")
+				log("Reject", "Sys", "localhost", "Database Error")
 				w.Write([]byte("Server Failure"))
 				return
 			}
-			succ = tool.Create(creator, item, amount, kind)
+			succ = createNew(creator, item, amount, kind)
 			if !succ {
-				tool.Log("Create After Reject", "Sys", "localhost", "Database Error")
+				log("Create After Reject", "Sys", "localhost", "Database Error")
 				w.Write([]byte("Server Failure"))
 			} else {
 				ip := r.Header.Get("X-Real-Ip")
-				tool.Log("HandleReject", uID, ip, "Succ")
+				log("HandleReject", uID, ip, "Succ")
 				w.Write([]byte("Success"))
 			}
 		} else {
 			ip := r.Header.Get("X-Real-Ip")
-			tool.Log("HandleReject", uID, ip, "Permission Denied")
+			log("HandleReject", uID, ip, "Permission Denied")
 			w.Write([]byte("Unauthorized"))
 		}
 	} else {
 		ip := r.Header.Get("X-Real-Ip")
-		tool.Log("HandleReject", "Unknown", ip, "Validate Fail")
+		log("HandleReject", "Unknown", ip, "Validate Fail")
 		w.Write([]byte("Unauthorized"))
 	}
 }
@@ -372,42 +371,42 @@ func handleCancel(w http.ResponseWriter, r *http.Request) {
 	cUID, err := r.Cookie("uid")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		tool.Log("ReadCookie", "Sys", "localhost", "Controller Error")
+		log("ReadCookie", "Sys", "localhost", "Controller Error")
 		return
 	}
 	cSessionID, err := r.Cookie("sessionID")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		tool.Log("ReadSession", "Sys", "localhost", "Controller Error")
+		log("ReadSession", "Sys", "localhost", "Controller Error")
 		return
 	}
 	uID, sessionID := cUID.Value, cSessionID.Value
 	orderID, _ := ioutil.ReadAll(r.Body)
 	if users[uID].SessionID == sessionID {
-		if tool.HavePermission(uID, "1", string(orderID)) {
-			succ, creator, item, amount, kind := tool.Cancel(string(orderID))
+		if havePermission(uID, "1", string(orderID)) {
+			succ, creator, item, amount, kind := cancel(string(orderID))
 			if !succ {
-				tool.Log("Cancel", "Sys", "localhost", "Database Error")
+				log("Cancel", "Sys", "localhost", "Database Error")
 				w.Write([]byte("Server Failure"))
 				return
 			}
-			succ = tool.Create(creator, item, amount, kind)
+			succ = createNew(creator, item, amount, kind)
 			if !succ {
-				tool.Log("Create After Cancel", "Sys", "localhost", "Database Error")
+				log("Create After Cancel", "Sys", "localhost", "Database Error")
 				w.Write([]byte("Server Failure"))
 			} else {
 				ip := r.Header.Get("X-Real-Ip")
-				tool.Log("HandleCancel", uID, ip, "Succ")
+				log("HandleCancel", uID, ip, "Succ")
 				w.Write([]byte("Success"))
 			}
 		} else {
 			ip := r.Header.Get("X-Real-Ip")
-			tool.Log("HandleCancel", uID, ip, "Permission Denied")
+			log("HandleCancel", uID, ip, "Permission Denied")
 			w.Write([]byte("Unauthorized"))
 		}
 	} else {
 		ip := r.Header.Get("X-Real-Ip")
-		tool.Log("HandleCancel", "Unknown", ip, "Validate Fail")
+		log("HandleCancel", "Unknown", ip, "Validate Fail")
 		w.Write([]byte("Unauthorized"))
 	}
 }
@@ -416,36 +415,36 @@ func handleConfirm(w http.ResponseWriter, r *http.Request) {
 	cUID, err := r.Cookie("uid")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		tool.Log("ReadCookie", "Sys", "localhost", "Controller Error")
+		log("ReadCookie", "Sys", "localhost", "Controller Error")
 		return
 	}
 	cSessionID, err := r.Cookie("sessionID")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
-		tool.Log("ReadSession", "Sys", "localhost", "Controller Error")
+		log("ReadSession", "Sys", "localhost", "Controller Error")
 		return
 	}
 	uID, sessionID := cUID.Value, cSessionID.Value
 	orderID, _ := ioutil.ReadAll(r.Body)
 	if users[uID].SessionID == sessionID {
-		if tool.HavePermission(uID, "0", string(orderID)) {
-			succ := tool.Confirm(string(orderID))
+		if havePermission(uID, "0", string(orderID)) {
+			succ := confirm(string(orderID))
 			if !succ {
-				tool.Log("Confirm", "Sys", "localhost", "Database Error")
+				log("Confirm", "Sys", "localhost", "Database Error")
 				w.Write([]byte("Server Failure"))
 			} else {
 				ip := r.Header.Get("X-Real-Ip")
-				tool.Log("Confirm", uID, ip, "Succ")
+				log("Confirm", uID, ip, "Succ")
 				w.Write([]byte("Success"))
 			}
 		} else {
 			ip := r.Header.Get("X-Real-Ip")
-			tool.Log("HandleConfirm", uID, ip, "Permission Denied")
+			log("HandleConfirm", uID, ip, "Permission Denied")
 			w.Write([]byte("Unauthorized"))
 		}
 	} else {
 		ip := r.Header.Get("X-Real-Ip")
-		tool.Log("HandleConfirm", "Unknown", ip, "Validate Fail")
+		log("HandleConfirm", "Unknown", ip, "Validate Fail")
 		w.Write([]byte("Unauthorized"))
 	}
 }
@@ -455,7 +454,7 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 	form := fmt.Sprintf("client_id=wep&client_secret=%s&grant_type=authorization_code&code=%s&redirect_uri=https://wep.qz5z.ren/auth_callback&scope=", s, code)
 	resp, err := http.Post("https://open.qz5z.ren/oauth2/authorize/token", "application/x-www-form-urlencoded", strings.NewReader(form))
 	if err != nil {
-		tool.Log("HandleAuth", "Sys", "localhost", "Controller Error")
+		log("HandleAuth", "Sys", "localhost", "Controller Error")
 	}
 
 	var auth struct {
@@ -467,7 +466,7 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 	form = fmt.Sprintf("access_token=%s&scope=", auth.AccessToken)
 	resp, err = http.Post("https://open.qz5z.ren/oauth2/api/getUserData", "application/x-www-form-urlencoded", strings.NewReader(form))
 	if err != nil {
-		tool.Log("HandleAuth", "Sys", "localhost", "Controller Error")
+		log("HandleAuth", "Sys", "localhost", "Controller Error")
 	}
 
 	var data struct {
@@ -485,10 +484,10 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 		SessionID string `json:"sessionID"`
 		Name      string `json:"name"`
 	}
-	if !tool.HaveUser(data.UID) {
-		succ := tool.NewUser(data.UID, data.Name, data.Grade+data.Class)
+	if !haveUser(data.UID) {
+		succ := newUser(data.UID, data.Name, data.Grade+data.Class)
 		if !succ {
-			tool.Log("NewUser", "Sys", "localhost", "Database Error")
+			log("NewUser", "Sys", "localhost", "Database Error")
 			result.Status = "fail"
 			result.UID = ""
 			b, _ := json.Marshal(result)
@@ -504,7 +503,7 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 	result.Status, result.UID, result.SessionID, result.Name = "succ", data.UID, tempUser.SessionID, data.Name
 	b, _ := json.Marshal(result)
 	ip := r.Header.Get("X-Real-Ip")
-	tool.Log("Login", data.UID, ip, "Succ")
+	log("Login", data.UID, ip, "Succ")
 	w.Write(b)
 }
 
@@ -512,5 +511,5 @@ func handleExit(w http.ResponseWriter, r *http.Request) {
 	b, _ := ioutil.ReadAll(r.Body)
 	delete(users, string(b))
 	ip := r.Header.Get("X-Real-Ip")
-	tool.Log("HandleExit", string(b), ip, "Succ")
+	log("HandleExit", string(b), ip, "Succ")
 }
