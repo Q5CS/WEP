@@ -3,8 +3,6 @@ package main
 import (
 	"database/sql"
 	"errors"
-	"fmt"
-	"os"
 
 	//匿名导入数据库驱动
 	_ "github.com/go-sql-driver/mysql"
@@ -14,55 +12,51 @@ var db *sql.DB
 var marketPlaceData string
 var isMarketPlaceModified bool
 
-func checkErr(err error) {
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(-1)
-	}
-}
-
-func createConnection(password string) bool {
+func createConnection(password string) error {
 	newDB, err := sql.Open("mysql", "app:"+password+"@tcp(localhost:3306)/q5xy?charset=utf8")
-	checkErr(err)
+	if err != nil {
+		return err
+	}
+	err = db.Ping()
+	if err != nil {
+		return err
+	}
 	db = newDB
 	isMarketPlaceModified = true
 	praseMarketPlace()
-	return true
+	return nil
 }
 
-func newUser(id string, name string, class string) bool {
+func newUser(id string, name string, class string) error {
 	_, err := db.Exec("insert into users (id,name,class) values (?,?,?)", id, name, class)
-	if err != nil {
-		return false
-	}
-	return true
+	return err
 }
 
-func haveUser(id string) bool {
+func haveUser(id string) (error, bool) {
 	rows, err := db.Query("select count(*) from users where id=?", id)
 	if err != nil {
-		return false
+		return err, false
 	}
 	var count int
 	for rows.Next() {
 		err = rows.Scan(&count)
 		if err != nil {
-			return false
+			return err, false
 		}
 	}
-	return (count == 1)
+	return nil, (count != 1)
 }
 
-func havePermission(uID string, role string, orderID string) bool {
+func havePermission(uID string, role string, orderID string) (error, bool) {
 	rows, err := db.Query("select count(*) from orders where id=?", orderID)
 	if err != nil {
-		return false
+		return err, false
 	}
 	var oCount int
 	for rows.Next() {
 		err = rows.Scan(&oCount)
 		if err != nil {
-			return false
+			return err, false
 		}
 	}
 	result := true
@@ -72,13 +66,13 @@ func havePermission(uID string, role string, orderID string) bool {
 		if role == "0" {
 			rows, err = db.Query("select creator from orders where id=?", orderID)
 			if err != nil {
-				return false
+				return err, false
 			}
 			var cID string
 			for rows.Next() {
 				err = rows.Scan(&cID)
 				if err != nil {
-					return false
+					return err, false
 				}
 			}
 			if cID != uID {
@@ -87,13 +81,13 @@ func havePermission(uID string, role string, orderID string) bool {
 		} else if role == "1" {
 			rows, err = db.Query("select matcher from orders where id=?", orderID)
 			if err != nil {
-				return false
+				return err, false
 			}
 			var mID string
 			for rows.Next() {
 				err = rows.Scan(&mID)
 				if err != nil {
-					return false
+					return err, false
 				}
 			}
 			if mID != uID {
@@ -101,16 +95,16 @@ func havePermission(uID string, role string, orderID string) bool {
 			}
 		}
 	}
-	return result
+	return nil, result
 }
 
-func createNew(id string, item string, amount string, kind string) bool {
+func createNew(id string, item string, amount string, kind string) error {
 	_, err := db.Exec("insert into orders (creator,item,amount,kind,date,status) values (?,?,?,?,now(),0)", id, item, amount, kind)
 	if err != nil {
-		return false
+		return err
 	}
 	isMarketPlaceModified = true
-	return true
+	return nil
 }
 
 func match(uID string, orderID string) error {
@@ -138,146 +132,143 @@ func match(uID string, orderID string) error {
 	return nil
 }
 
-func getInfo(uID string, role string, orderID string) (bool, string, string) {
+func getInfo(uID string, role string, orderID string) (error, string, string) {
 	rows, err := db.Query("select creator,matcher,status from orders where id=?", orderID)
 	if err != nil {
-		return false, "", ""
+		return err, "", ""
 	}
 	var creator, matcher, status string
 	name, class := "", ""
 	for rows.Next() {
 		err = rows.Scan(&creator, &matcher, &status)
 		if err != nil {
-			return false, "", ""
+			return err, "", ""
 		}
 	}
 	if status == "1" || status == "2" || status == "3" {
 		stmt, err := db.Prepare("select name,class from users where id=?")
 		if err != nil {
-			return false, "", ""
+			return err, "", ""
 		}
 
 		if role == "0" {
 			rows, err := stmt.Query(matcher)
 			if err != nil {
-				return false, "", ""
+				return err, "", ""
 			}
 			for rows.Next() {
 				err = rows.Scan(&name, &class)
 				if err != nil {
-					return false, "", ""
+					return err, "", ""
 				}
 			}
 		} else if role == "1" {
 			rows, err := stmt.Query(creator)
 			if err != nil {
-				return false, "", ""
+				return err, "", ""
 			}
 			for rows.Next() {
 				err = rows.Scan(&name, &class)
 				if err != nil {
-					return false, "", ""
+					return err, "", ""
 				}
 			}
 		}
 	}
-	return true, name, class
+	return nil, name, class
 }
 
-func deleteOrder(orderID string) bool {
+func deleteOrder(orderID string) error {
 	_, err := db.Exec("delete from orders where id=?", orderID)
-	if err != nil {
-		return false
-	}
-	return true
+	return err
 }
 
-func reject(orderID string) (bool, string, string, string, string) {
+func reject(orderID string) (error, string, string, string, string) {
 	rows, err := db.Query("select creator,item,amount,kind,status from orders where id=?", orderID)
 	if err != nil {
-		return false, "", "", "", ""
+		return err, "", "", "", ""
 	}
 	var creator, item, amount, kind, status string
 	for rows.Next() {
 		err = rows.Scan(&creator, &item, &amount, &kind, &status)
 		if err != nil {
-			return false, "", "", "", ""
+			return err, "", "", "", ""
 		}
 	}
 	if status == "1" {
 		_, err = db.Exec("update orders set status=\"3\" where id=?", orderID)
 		if err != nil {
-			return false, "", "", "", ""
+			return err, "", "", "", ""
 		}
 	}
 	isMarketPlaceModified = true
-	return true, creator, item, amount, kind
+	return nil, creator, item, amount, kind
 }
 
-func cancel(orderID string) (bool, string, string, string, string) {
+func cancel(orderID string) (error, string, string, string, string) {
 	rows, err := db.Query("select creator,item,amount,kind,status from orders where id=?", orderID)
 	if err != nil {
-		return false, "", "", "", ""
+		return err, "", "", "", ""
 	}
 	var creator, item, amount, kind, status string
 	for rows.Next() {
 		err = rows.Scan(&creator, &item, &amount, &kind, &status)
 		if err != nil {
-			return false, "", "", "", ""
+			return err, "", "", "", ""
 		}
 	}
 	if status == "1" {
 		_, err = db.Exec("update orders set status=\"3\" where id=?", orderID)
 		if err != nil {
-			return false, "", "", "", ""
+			return err, "", "", "", ""
 		}
 	}
 	isMarketPlaceModified = true
-	return true, creator, item, amount, kind
+	return nil, creator, item, amount, kind
 }
 
-func confirm(orderID string) bool {
+func confirm(orderID string) error {
 	rows, err := db.Query("select status from orders where id=?", orderID)
 	if err != nil {
-		return false
+		return err
 	}
 	var status string
 	for rows.Next() {
 		err = rows.Scan(&status)
 		if err != nil {
-			return false
+			return err
 		}
 	}
 	if status == "1" {
 		_, err = db.Exec("update orders set status=\"2\" where id=?", orderID)
 		if err != nil {
-			return false
+			return err
 		}
 	}
-	return true
+	return nil
 }
 
-func praseTable(id string) (bool, string) {
+func praseTable(id string) (error, string) {
 	rows, err := db.Query("select count(*) from orders where creator=?", id)
 	if err != nil {
-		return false, ""
+		return err, ""
 	}
 	var cCount int
 	for rows.Next() {
 		err = rows.Scan(&cCount)
 		if err != nil {
-			return false, ""
+			return err, ""
 		}
 	}
 	rows, err = db.Query("select count(*) from orders where matcher=?", id)
 	if err != nil {
-		return false, ""
+		return err, ""
 	}
 	var mCount int
 	for rows.Next() {
 		err = rows.Scan(&mCount)
 		if err != nil {
-			return false, ""
+			return err, ""
 		}
 	}
 
@@ -288,7 +279,7 @@ func praseTable(id string) (bool, string) {
 		if cCount != 0 {
 			rows, err := db.Query("select id,item,amount,kind,date,status from orders where creator=?", id)
 			if err != nil {
-				return false, ""
+				return err, ""
 			}
 			for rows.Next() {
 				var (
@@ -296,7 +287,7 @@ func praseTable(id string) (bool, string) {
 				)
 				err := rows.Scan(&id, &item, &amount, &kind, &date, &status)
 				if err != nil {
-					return false, ""
+					return err, ""
 				}
 				result += id + "|" + item + "|" + amount + "|" + kind + "|" + date + "|" + status + "|0/"
 			}
@@ -305,7 +296,7 @@ func praseTable(id string) (bool, string) {
 		if mCount != 0 {
 			rows, err := db.Query("select id,item,amount,kind,date,status from orders where matcher=?", id)
 			if err != nil {
-				return false, ""
+				return err, ""
 			}
 			for rows.Next() {
 				var (
@@ -313,26 +304,26 @@ func praseTable(id string) (bool, string) {
 				)
 				err := rows.Scan(&id, &item, &amount, &kind, &date, &status)
 				if err != nil {
-					return false, ""
+					return err, ""
 				}
 				result += id + "|" + item + "|" + amount + "|" + kind + "|" + date + "|" + status + "|1/"
 			}
 		}
 	}
-	return true, result
+	return nil, result
 }
 
-func praseMarketPlace() (bool, string) {
+func praseMarketPlace() (error, string) {
 	if isMarketPlaceModified {
 		stmt, err := db.Prepare("select id,creator,amount,kind,date from orders where item=? and status=0")
 		if err != nil {
-			return false, ""
+			return err, ""
 		}
 		marketPlaceData = ""
 		for i := 0; i < 5; i++ {
 			rows, err := stmt.Query(i)
 			if err != nil {
-				return false, ""
+				return err, ""
 			}
 			/* if !rows.Next() {
 				marketPlace += "-||"
@@ -344,11 +335,11 @@ func praseMarketPlace() (bool, string) {
 				var id, creator, amount, kind, date, class string
 				err = rows.Scan(&id, &creator, &amount, &kind, &date)
 				if err != nil {
-					return false, ""
+					return err, ""
 				}
 				user, err := db.Query("select class from users where id=?", creator)
 				if err != nil {
-					return false, ""
+					return err, ""
 				}
 				for user.Next() {
 					user.Scan(&class)
@@ -361,10 +352,10 @@ func praseMarketPlace() (bool, string) {
 			marketPlaceData += "||"
 		}
 	}
-	return true, marketPlaceData
+	return nil, marketPlaceData
 }
 
-func log(action string, user string, ip string, status string) {
+/* func log(action string, user string, ip string, status string) {
 	_, err := db.Exec("insert into logs (time,action,user,ip,status) values (now(),?,?,?,?)", action, user, ip, status)
 	if status == "fatal" {
 		fmt.Printf(`Fatal error when user "%s" from IP "%s" is performing action "%s"`, user, ip, action)
@@ -373,4 +364,4 @@ func log(action string, user string, ip string, status string) {
 		fmt.Println(`Fail to save logs`)
 		os.Exit(1)
 	}
-}
+} */
