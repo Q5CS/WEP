@@ -141,12 +141,11 @@ func handleDashboard(w http.ResponseWriter, r *http.Request) {
 			log.Panicln(err)
 			return
 			//log("PraseTable", "Sys", "localhost", "Database Error")
-		} else {
-			dashBoardData := base64.StdEncoding.EncodeToString([]byte(original))
-			w.Write([]byte(dashBoardData))
-			//ip := r.Header.Get("X-Real-Ip")
-			//log("DashBoard", data.UID, ip, "Succ")
 		}
+		dashBoardData := base64.StdEncoding.EncodeToString([]byte(original))
+		w.Write([]byte(dashBoardData))
+		//ip := r.Header.Get("X-Real-Ip")
+		//log("DashBoard", data.UID, ip, "Succ")
 	} else {
 		//ip := r.Header.Get("X-Real-Ip")
 		w.Write([]byte("Unauthorized"))
@@ -203,11 +202,10 @@ func handleOppositeInfo(w http.ResponseWriter, r *http.Request) {
 				log.Panicln(err)
 				return
 				//log("GetInfo", "Sys", "localhost", "Database Error")
-			} else {
-				//ip := r.Header.Get("X-Real-Ip")
-				//log("GetOppositeInfo", uID, ip, "Succ")
-				result.Status = "Success"
 			}
+			//ip := r.Header.Get("X-Real-Ip")
+			//log("GetOppositeInfo", uID, ip, "Succ")
+			result.Status = "Success"
 		} else {
 			//ip := r.Header.Get("X-Real-Ip")
 			//log("GetOppositeInfo", "Unknown", ip, "Validate Fail")
@@ -252,11 +250,10 @@ func handleCreate(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("Server Failure"))
 			log.Panicln(err)
 			return
-		} else {
-			//ip := r.Header.Get("X-Real-Ip")
-			//log("HandleCreate", uID, ip, "Succ")
-			w.Write([]byte("Success"))
 		}
+		//ip := r.Header.Get("X-Real-Ip")
+		//log("HandleCreate", uID, ip, "Succ")
+		w.Write([]byte("Success"))
 	} else {
 		//ip := r.Header.Get("X-Real-Ip")
 		//log("HandleCreate", "Unknown", ip, "Validate Fail")
@@ -389,11 +386,10 @@ func handleReject(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte("Server Failure"))
 				log.Panicln(err)
 				return
-			} else {
-				//ip := r.Header.Get("X-Real-Ip")
-				//log("HandleReject", uID, ip, "Succ")
-				w.Write([]byte("Success"))
 			}
+			//ip := r.Header.Get("X-Real-Ip")
+			//log("HandleReject", uID, ip, "Succ")
+			w.Write([]byte("Success"))
 		} else {
 			//ip := r.Header.Get("X-Real-Ip")
 			//log("HandleReject", uID, ip, "Permission Denied")
@@ -445,11 +441,10 @@ func handleCancel(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte("Server Failure"))
 				log.Panicln(err)
 				return
-			} else {
-				//ip := r.Header.Get("X-Real-Ip")
-				//log("HandleCancel", uID, ip, "Succ")
-				w.Write([]byte("Success"))
 			}
+			//ip := r.Header.Get("X-Real-Ip")
+			//log("HandleCancel", uID, ip, "Succ")
+			w.Write([]byte("Success"))
 		} else {
 			//ip := r.Header.Get("X-Real-Ip")
 			//log("HandleCancel", uID, ip, "Permission Denied")
@@ -494,16 +489,14 @@ func handleConfirm(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte("Server Failure"))
 				log.Panicln(err)
 				return
-			} else {
-				//ip := r.Header.Get("X-Real-Ip")
-				//log("Confirm", uID, ip, "Succ")
-				w.Write([]byte("Success"))
 			}
-		} else {
 			//ip := r.Header.Get("X-Real-Ip")
-			//log("HandleConfirm", uID, ip, "Permission Denied")
-			w.Write([]byte("Unauthorized"))
+			//log("Confirm", uID, ip, "Succ")
+			w.Write([]byte("Success"))
 		}
+		//ip := r.Header.Get("X-Real-Ip")
+		//log("HandleConfirm", uID, ip, "Permission Denied")
+		w.Write([]byte("Unauthorized"))
 	} else {
 		//ip := r.Header.Get("X-Real-Ip")
 		//log("HandleConfirm", "Unknown", ip, "Validate Fail")
