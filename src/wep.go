@@ -14,11 +14,7 @@ import (
 	"strings"
 )
 
-type user struct {
-	SessionID string
-}
-
-var users map[string]user
+var users map[string]string
 
 var (
 	p string
@@ -48,12 +44,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	users = make(map[string]user)
+	users = make(map[string]string)
 	err := createConnection(p)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	//log("Start", "sys", "localhost", "Succ")
+	log.Println("数据库连接成功。")
 
 	http.Handle("/css/", http.StripPrefix("/css/", http.FileServer(http.Dir("./front/css/"))))
 	http.Handle("/fonts/", http.StripPrefix("/fonts/", http.FileServer(http.Dir("./front/fonts/"))))
@@ -67,7 +63,7 @@ func main() {
 	http.HandleFunc("/marketPlace", marketPlace)
 	http.HandleFunc("/create", create)
 
-	http.HandleFunc("/handlers/dashboard", handleDashboard)
+	/* http.HandleFunc("/handlers/dashboard", handleDashboard)
 	http.HandleFunc("/handlers/marketPlace", handleMarketPlace)
 	http.HandleFunc("/handlers/oppositeInfo", handleOppositeInfo)
 	http.HandleFunc("/handlers/create", handleCreate)
@@ -77,12 +73,14 @@ func main() {
 	http.HandleFunc("/handlers/cancel", handleCancel)
 	http.HandleFunc("/handlers/confirm", handleConfirm)
 	http.HandleFunc("/handlers/auth_callback", handleAuth)
-	http.HandleFunc("/handlers/exit", handleExit)
+	http.HandleFunc("/handlers/exit", handleExit) */
+	http.HandleFunc("/api", api)
 
 	err = http.ListenAndServe(":9090", nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
+	log.Println("服务器已启动。")
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
@@ -113,6 +111,121 @@ func marketPlace(w http.ResponseWriter, r *http.Request) {
 func create(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("./front/create.html")
 	t.Execute(w, nil)
+}
+
+
+/*
+数据包结构：
+{
+	uID:11xxx,
+	authCode:"xxx",
+	action:"xxx",
+	body:[
+		{xxx:xxx},
+		{xxx:xxx},
+		{xxx:xxx},
+	]
+}
+*/
+
+//定义JSON对象
+type request struct {
+	UID string `json:"uID"`
+	AuthCode string `json:"authCode"`
+	Action string `json:"action"`
+	Body map[string]string `json:"body"`
+}
+type response struct {
+	Code string `json:"code"`
+	Description string `json:"description"`
+	Body map[string]string `json:"body"`
+}
+
+func api(w http.ResponseWriter, r *http.Request) {
+	var request request
+	var response response 
+
+	//解析请求
+	bo, _ := ioutil.ReadAll(r.Body)
+	json.Unmarshal(bo,&request)
+	
+	//鉴权
+	if users[request.UID] != request.AuthCode {
+		response.Code = "401"
+		response.Description = "鉴权失败，请重新登录！"
+		re, _ := json.Marshal(response)
+		w.Write(re)
+		return
+	}
+
+	//分发
+	switch request.Action {
+	case "dashboard":
+
+	case "marketplace":
+
+	case "create":
+
+	case "match":
+
+	case "delete":
+
+	case "reject":
+
+	case "cancel":
+
+	case "confirm":
+
+	case "authCallback":
+
+	case "exit":
+
+	default:
+		response.Code = "400"
+		response.Description = "错误的请求！"
+		re, _ := json.Marshal(response)
+		w.Write(re)
+	}
+}
+
+func apiDashboard(request request) response {
+
+}
+
+func apiMarketplace(request request) response {
+
+}
+
+func apiCreate(request request) response {
+
+}
+
+func apiMatch(request request) response {
+
+}
+
+func apiDelete(request request) response {
+
+}
+
+func apiReject(request request) response {
+
+}
+
+func apiCancel(request request) response {
+
+}
+
+func apiConfirm(request request) response {
+
+}
+
+func apiAuthCallback(request request) response {
+
+}
+
+func apiExit(request request) response {
+
 }
 
 func handleDashboard(w http.ResponseWriter, r *http.Request) {

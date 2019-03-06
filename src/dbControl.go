@@ -312,6 +312,47 @@ func praseTable(id string) (error, string) {
 	}
 	return nil, result
 }
+/*
+{
+	id:xxx,
+	name:xxx,
+	remain:xxx,
+	pairCount:xxx,
+	pairs:[
+		{
+			id:xxx,
+			amount:xxx,
+			receiverInfo:xxx,
+		}
+	]
+}
+*/
+func praseDashboard(UID string) (string, error) {
+	result := "{offers:["
+	market, err := db.Query("select id,name,remain,pairCount from market where offerer=?", UID)
+	if err != nil {return "", err}
+	for market.Next() {
+		var marketID, name, remain, pairCount string
+		market.Scan(&marketID, &name, &remain, &pairCount)
+		result += `{id:"`+marketID+`",name:"`+name+`",remain:"`+remain+`",pairCount:"`+pairCount+`",pairs:[`
+		if pairCount != 0 {
+			pairs, _ := db.Query("select id,amount,receiverInfo from pairs where target=?", id)
+			for pairs.Next() {
+				var pairID, amount, receiverInfo string
+				pairs.Scan(&pairID, &amount, &receiverInfo)
+				result += `{id:"`+pairID+`",info:"`+receiverInfo+`"}`
+			}
+		}
+		result += `]}`
+	}
+	result += "],pairs:["
+	pairs, _ := db.Query("select id,amount,target from pairs where receiverID=?", UID)
+	for pairs.Next() {
+		var id, amount, target string
+		pairs.Scan(&id, &amount, &target)
+		
+	}
+}
 
 func praseMarketPlace() (error, string) {
 	if isMarketPlaceModified {
