@@ -113,7 +113,6 @@ func create(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, nil)
 }
 
-
 /*
 数据包结构：
 {
@@ -130,25 +129,25 @@ func create(w http.ResponseWriter, r *http.Request) {
 
 //定义JSON对象
 type request struct {
-	UID string `json:"uID"`
-	AuthCode string `json:"authCode"`
-	Action string `json:"action"`
-	Body map[string]string `json:"body"`
+	UID      string            `json:"uID"`
+	AuthCode string            `json:"authCode"`
+	Action   string            `json:"action"`
+	Body     map[string]string `json:"body"`
 }
 type response struct {
-	Code string `json:"code"`
-	Description string `json:"description"`
-	Body map[string]string `json:"body"`
+	Code        string            `json:"code"`
+	Description string            `json:"description"`
+	Body        map[string]string `json:"body"`
 }
 
 func api(w http.ResponseWriter, r *http.Request) {
 	var request request
-	var response response 
+	var response response
 
 	//解析请求
 	bo, _ := ioutil.ReadAll(r.Body)
-	json.Unmarshal(bo,&request)
-	
+	json.Unmarshal(bo, &request)
+
 	//鉴权
 	if users[request.UID] != request.AuthCode {
 		response.Code = "401"
@@ -248,12 +247,12 @@ func handleDashboard(w http.ResponseWriter, r *http.Request) {
 	b, _ := ioutil.ReadAll(r.Body)
 	json.Unmarshal(b, &data)
 	if users[data.UID].SessionID == data.SessionID {
-		err, original := praseTable(data.UID)
+		err, original := parseTable(data.UID)
 		if err != nil {
 			w.Write([]byte("Server Failure"))
 			log.Panicln(err)
 			return
-			//log("PraseTable", "Sys", "localhost", "Database Error")
+			//log("parseTable", "Sys", "localhost", "Database Error")
 		}
 		dashBoardData := base64.StdEncoding.EncodeToString([]byte(original))
 		w.Write([]byte(dashBoardData))
@@ -267,7 +266,7 @@ func handleDashboard(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleMarketPlace(w http.ResponseWriter, r *http.Request) {
-	err, original := praseMarketPlace()
+	err, original := parseMarketPlace()
 	if err != nil {
 		log.Panicln(err)
 		return

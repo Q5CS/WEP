@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"errors"
+	"strconv"
 
 	//匿名导入数据库驱动
 	_ "github.com/go-sql-driver/mysql"
@@ -23,7 +24,7 @@ func createConnection(password string) error {
 	}
 	db = newDB
 	isMarketPlaceModified = true
-	praseMarketPlace()
+	parseMarketPlace()
 	return nil
 }
 
@@ -248,7 +249,7 @@ func confirm(orderID string) error {
 	return nil
 }
 
-func praseTable(id string) (error, string) {
+func parseTable(id string) (error, string) {
 	rows, err := db.Query("select count(*) from orders where creator=?", id)
 	if err != nil {
 		return err, ""
@@ -312,12 +313,14 @@ func praseTable(id string) (error, string) {
 	}
 	return nil, result
 }
+
 /*
 {
 	id:xxx,
 	name:xxx,
 	remain:xxx,
 	pairCount:xxx,
+	description:xxx,
 	pairs:[
 		{
 			id:xxx,
@@ -326,35 +329,54 @@ func praseTable(id string) (error, string) {
 		}
 	]
 }
+{
+	id:xxx,
+	amount:xxx,
+	targetID:xxx,
+	targetName:xxx,
+	offererInfo:xxx
+}
 */
-func praseDashboard(UID string) (string, error) {
+func parseDashboard(UID string) (string, error) {
 	result := "{offers:["
-	market, err := db.Query("select id,name,remain,pairCount from market where offerer=?", UID)
-	if err != nil {return "", err}
+	market, err := db.Query("select id,name,remain,pairCount,description from market where offerer=?", UID)
+	if err != nil {
+		return "", err
+	}
 	for market.Next() {
-		var marketID, name, remain, pairCount string
-		market.Scan(&marketID, &name, &remain, &pairCount)
-		result += `{id:"`+marketID+`",name:"`+name+`",remain:"`+remain+`",pairCount:"`+pairCount+`",pairs:[`
+		var marketID, name, description string
+		var remain, pairCount int
+		market.Scan(&marketID, &name, &remain, &pairCount, &description)
+		result += `{id:"` + marketID + `",name:"` + name + `",remain:` + strconv.Itoa(remain) + `,pairCount:` + strconv.Itoa(pairCount) + `,description:"` + description + `",pairs:[`
 		if pairCount != 0 {
-			pairs, _ := db.Query("select id,amount,receiverInfo from pairs where target=?", id)
+			pairs, _ := db.Query("select id,amount,receiverInfo from pairs where target=?", UID)
 			for pairs.Next() {
 				var pairID, amount, receiverInfo string
 				pairs.Scan(&pairID, &amount, &receiverInfo)
-				result += `{id:"`+pairID+`",info:"`+receiverInfo+`"}`
+				result += `{id:"` + pairID + `",info:"` + receiverInfo + `"},`
 			}
 		}
-		result += `]}`
+		result += `]},`
 	}
 	result += "],pairs:["
 	pairs, _ := db.Query("select id,amount,target from pairs where receiverID=?", UID)
 	for pairs.Next() {
-		var id, amount, target string
+		var id, target string
+		var amount int
 		pairs.Scan(&id, &amount, &target)
-		
+		result += `{id:"` + id + `",amount:` + strconv.Itoa(amount) + `,`
+		market, _ := db.Query("select id,name,offererInfo from market where id=?", target)
+		for market.Next() {
+			var targetID, name, offererInfo string
+			market.Scan(&id, &name, &offererInfo)
+			result += `targetID:"` + targetID + `",targetName:"` + name + `",offererInfo:"` + offererInfo + `"}`
+		}
 	}
+	result += `]}`
+	return result, nil
 }
 
-func praseMarketPlace() (error, string) {
+func parseMarketPlace() (error, string) {
 	if isMarketPlaceModified {
 		stmt, err := db.Prepare("select id,creator,amount,kind,date from orders where item=? and status=0")
 		if err != nil {
